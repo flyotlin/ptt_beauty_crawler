@@ -1,61 +1,47 @@
 import requests
 from bs4 import BeautifulSoup
 import os
+import time
 
-class Url:
-    __url = ""
-    __htmlSource = ""
-    __soup = ""
-    __aTags = ""
-    __link = []
-    def __init__(self, url):
-        # super().__init__()
-        self.url = url
+# check whether the object directory exists
+def check_path(path):
+    if(os.path.exists(path) == False):
+        os.mkdir(path)
 
-    def get_url(self):
-        return self.__url
-
-    def get_link(self):
-        return self.__link
-
-    def get_htmlSource(self):
-        return self.__htmlSource
+class Crawl:
+    url = ""
+    html = ""
+    soup = ""
+    aTags = ""
+    link = []
     
-    def get_soup(self):
-        return self.__soup
+    # init, constructor
+    def __init__(self, url):
+        self.url = url
+        self.fetch_html()
+        self.parse_soup()
+    
+    # request the html source
+    def fetch_html(self):
+        self.html = requests.get(self.url, cookies={'over18': '1'})
+    
+    def parse_soup(self):
+        self.soup = BeautifulSoup(self.html.text, "html.parser")
+    
+    def parse_aTags(self, selector):
+        self.aTags = self.soup.select(selector)
 
-    def set_htmlSource(self, res):
-        self.__htmlSource = res
+    def set_link(self, http, jpg):
+        for t in self.aTags:
+            t = http + t['href'] + jpg
+            self.link.append(t)
 
-    def set_soup(self, soup):
-        self.__soup = BeautifulSoup(soup.text, "html.parser")
+    # download the jpg as binary
+    def download(self, file_path, html):
+        with open(file_path, "wb") as file:
+            file.write(html.content)
+            file.flush()
+        file.close()
 
-    def set_aTags(self, selector):
-        self.__aTags = self.__soup.select(selector)
-
-    def set_link(self):
-        for i in self.__aTags:
-            i = "https://www.ptt.cc/" + i['href']
-            self.__link.append(i)
-
-def fetch(url):
-    res = requests.get(url, cookies={'over18': '1'})
-    return res
-
-def get_htmlSource(res):
-    Url.set_htmlSource(Url, res)
-
-def soup(html):
-    Url.set_soup(Url, html)
-
-def soup_select(selector):
-    Url.set_aTags(Url, selector)
-
-# used for downloading, need to pass the html
-def download(file_name, html):
-    with open(file_name, "wb") as file:
-        file.write(html.content)
-        file.flush()
-    file.close()
 
 
