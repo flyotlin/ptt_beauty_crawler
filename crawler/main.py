@@ -21,13 +21,13 @@ def main():
         post.parse_aTags("a")
         post.set_link("", "")
         for i in post.link:
-            if(i[2] == "i") & (i[3] == "m"):
+            if(i[2] == "i") and (i[3] == "m"):
                 print(i)
                 file_path = directory_path + "Photo" + str(count) + ".jpg"
                 count += 1
                 i = "http:" + i + ".jpg"
                 hplink = cl.Crawl(i)
-                post.download(file_path, hplink.html
+                post.download(file_path, hplink.html)
         print("==========================")
 
     
